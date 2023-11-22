@@ -1,0 +1,6 @@
+set gaSet(ls4_1)      "10"
+set gaSet(ls4_2)      "11"
+set gaSet(ls4_3)      "12"
+set gaSet(ls4_4)      "13"
+set gaSet(ls4_DLS6x)  "6700"
+set gaSet(ls4_APD)    "RSD10"

@@ -1,0 +1,4 @@
+..11:12:44   05/08/2014..********* PAIR 23 start *********
+..11:14:47   05/08/2014..Test 7..UploadAppl fail. Reason: Config Download by TFTP of LA-1 fail 
+    ********* PAIR 23 FAIL   *********
+

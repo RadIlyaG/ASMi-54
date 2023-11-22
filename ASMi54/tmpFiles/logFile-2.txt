@@ -1,0 +1,20 @@
+ 
+********* PAIR 1 start *********..08:49:24   04/03/2012..
+All tests pass
+********* PAIR 1 finish *********..09:20:12   04/03/2012..
+
+
+********* Start Mac_BarCode Test *********..09:20:12   04/03/2012..
+MAC-1 - 0020D23BCBFB
+MAC-2 - 0020D23BCBF6
+Pair 1 Pass Barcode (MAC:0020D23BCBFB barcode:BZ2000352019) (MAC:0020D23BCBF6 barcode:DE1001223811)..09:21:49   04/03/2012..
+********* Finish Mac_BarCode Test *********..09:21:49   04/03/2012..
+
+MAC of Uut1: 0020D25626D4
+MAC of Uut2: 0020D256D3A6
+MAC of Uut1: 0020D25626D4
+MAC of Uut2: 0020D256D3A6
+MAC of Uut1: 0020D254DB59
+MAC of Uut2: 0020D254F2A7
+MAC of Uut1: 0020D254DB59
+MAC of Uut2: 0020D254F2A7
