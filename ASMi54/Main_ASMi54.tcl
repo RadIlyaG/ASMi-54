@@ -212,12 +212,6 @@ proc Testing {} {
       puts "\n **** Pair ${pair}. Test $numberedTest start; [MyTime] "
       update
       
-#       set ret [SetLine 18000]
-#       if {$ret!=0} {return $ret}
-      
-#       set ret [UUTsUp]
-#       if {$ret!=0} {return $ret}
-      
       set testName [lindex [split $numberedTest ..] end]
       $gaSet(startTime) configure -text "$startTime ."
       AddToLog "Test $numberedTest start"
@@ -231,41 +225,24 @@ proc Testing {} {
         set ret [$testName 1]
       }
       puts "1 testName:$testName ret:$ret" ; update
-#       if {$ret!=0 && $ret!="-2" && $testName!="Mac_BarCode" && $testName!="ID" && $testName!="Init"} {
-#         if {$gaSet(pair)!="1"} {
-#           PerfSet 0
-#         } elseif {$gaSet(pair)=="1"} {
-#           if {$gaSet(rerunTesterMulti)=="conf"} {
-#             PerfSet 1
-#           } elseif {$gaSet(rerunTesterMulti)=="sync"} {
-#             PerfSet 0
-#           }
-#         }
-#         MassConnect $pair
-#         ComConnect $pair
-#         set logFileID [open tmpFiles/logFile-$gaSet(pair).txt a+]
-#         puts $logFileID "**** Pair ${pair}. Test $numberedTest fail and rechecked. Reason: $gaSet(fail); [MyTime]"
-#         close $logFileID
-#         puts "\n **** Pair ${pair}. Rerun - Test $numberedTest finish;  ret of $numberedTest is: $ret;  [MyTime]\n"
-#         $gaSet(startTime) configure -text "$startTime .."
-#         set ret [UUTsUp]
-#         if {$ret==0} {
-#           set ret [$testName 2]
-#         }
-#         puts "2 testName:$testName ret:$ret" ; update
-#       }
+
       PerfSet 1 
       AddToLog "Test $numberedTest finish. Result: $ret" 
       if {$gaSet(pair)=="5"} {
-        AddToPairLog $::pair "Test $numberedTest finish. Result: $ret"
+        set pa $::pair
       } else {   
-        AddToPairLog $gaSet(pair) "Test $numberedTest finish. Result: $ret"    
+        set pa $gaSet(pair) 
       }
+      AddToPairLog $pa "Test $numberedTest finish. Result: $ret"
       puts "\n **** Pair ${pair}. Test $numberedTest finish;  ret of $numberedTest is: $ret;  [MyTime]\n" 
       update
       if {$ret!=0} {
   #       set gaSet(startFrom) $gaSet(curTest)
   #       update
+        if {$ret=="-1"} {
+          UnregIdBarcode $pa $gaSet($pa.barcodeUut1)
+          UnregIdBarcode $pa $gaSet($pa.barcodeUut2)
+        }
         break
       }
       if {$gaSet(oneTest)==1} {
@@ -364,22 +341,25 @@ proc Testing {} {
           PairPerfLab $pair yellow  
           set ret [PoRst $pair]
           if {$ret!=0} {
-          #set gaSet(fail) "Check BeeLine Default Fail"
-          set retBeePORST -1
+            #set gaSet(fail) "Check BeeLine Default Fail"
+            set retBeePORST -1
             AddToLog $gaSet(fail)
             if {$gaSet(pair)=="5"} {
               set pa $pair 
             } else {
               set pa $gaSet(pair)
-          }
+            }
             AddToPairLog $pa "Pair $pa Test..BeeLine Power Reset finish. Result: -1"
             AddToPairLog $pa "Pair $pa Test..BeeLine Power Reset fail. Reason: $gaSet(fail)"
+            
             lappend lBLPORSTfail $pair  
             PairPerfLab $pair red   
             file rename $gaSet(log.$pa) [file rootname $gaSet(log.$pa)]-Fail.txt 
             set gaSet(runStatus) Fail
             if {$ret!="-2"} {
               SQliteAddLine $::pair; #  $pa
+              UnregIdBarcode $pa $gaSet($pa.barcodeUut1)
+              UnregIdBarcode $pa $gaSet($pa.barcodeUut2)
             }  
           } else {
             AddToLog "Pair:$pair Test..BeeLine Power Reset finish. Result: 0"
@@ -458,6 +438,8 @@ proc Testing {} {
           set gaSet(runStatus) Fail
           if {$ret!="-2"} {
             SQliteAddLine  $::pair; # $pa
+            UnregIdBarcode $pa $gaSet($pa.barcodeUut1)
+            UnregIdBarcode $pa $gaSet($pa.barcodeUut2)
           }  
         } else {
           AddToLog "Pair:$pair Test..BeeLine Default finish. Result: 0"
@@ -508,6 +490,8 @@ proc Testing {} {
           set gaSet(runStatus) Fail
           if {$res!="-2"} {
             SQliteAddLine  $::pair; # $pa
+            UnregIdBarcode $pa $gaSet($pa.barcodeUut1)
+            UnregIdBarcode $pa $gaSet($pa.barcodeUut2)
           } 
         } elseif {$res==0} {
           ## MACREG will color the cell by green or red
@@ -575,6 +559,8 @@ proc Testing {} {
         set gaSet(runStatus) Fail
         if {$ret!="-2"} {
           SQliteAddLine  $::pair; # $pa
+          UnregIdBarcode $pa $gaSet($pa.barcodeUut1)
+          UnregIdBarcode $pa $gaSet($pa.barcodeUut2)
         }   
       } else {
         AddToLog "Pair:$pair Test..Mac_BarCode finish. Result: 0"

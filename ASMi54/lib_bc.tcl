@@ -1,6 +1,3 @@
-
- 
-
 #***************************************************************************
 #** DialogBoxEnt
 #** 
@@ -386,64 +383,59 @@ proc ReadBarcode {lPassPair} {
     CheckMac $barc1 $par Uut1
     CheckMac $barc2 $par Uut2
   }
-#   if {$gaSet(readTrace)=="0"} {
-#     foreach {ent1 ent2} [lsort -dict [array names gaDBox entVal*]] {
-#       incr pairIndx
-#       set pair [lindex $lPassPair $pairIndx]
-#       foreach uut {Uut1 Uut2} ent {1 2} {
-#         set barcode [string toupper $gaDBox([set ent$ent])] 
-#         set barc$ent $barcode 
-#         set gaSet($pair.barcode$uut) $barcode
-#         #AddToLog "Pair $pair , $uut - $barcode"
-#         puts "pair:$pair uut:$uut ent:$ent barcode:$barcode"
-#         if {$gaSet(pair)=="5"} {
-#           AddToLog "Pair $pair , $uut - $barcode"
-#         } else {
-#           AddToLog "Pair $gaSet(pair) , $uut - $barcode"
-#         }
-#       }
-#       if {$gaSet(pair)=="5"} {
-#         set gaSet(log.$pair) c:/logs/${gaSet(logTime)}-$barc1-$barc2.txt
-#         set pa $pair
-#       } else {
-#         set gaSet(log.$gaSet(pair)) c:/logs/${gaSet(logTime)}-$barc1-$barc2.txt
-#         set pa $gaSet(pair) 
-#       }
-#       AddToPairLog $pa "$gaSet(DutFullName)"
-#       AddToPairLog $pa "UUT1 - $barc1"
-#       AddToPairLog $pa "UUT2 - $barc2"
-#     }   
-#   } elseif {$gaSet(readTrace)=="1"} {
-#     foreach {ent1 ent2 ent3 ent4} [lsort -dict [array names gaDBox entVal*]] {
-#       incr pairIndx
-#       set pair [lindex $lPassPair $pairIndx]
-#       foreach uut {Uut1 Uut2} ent {1 3} tra {2 4} {
-#         set barcode [string toupper $gaDBox([set ent$ent])] 
-#         set barc$ent $barcode 
-#         set gaSet($pair.barcode$uut) $barcode
-#         set trac  [string toupper $gaDBox([set ent$tra])] 
-#         set gaSet($pair.trace$uut) $trac
-#         #AddToLog "Pair $pair , $uut - $barcode"
-#         puts "pair:$pair uut:$uut ent:$ent barcode:$barcode trace:$trac"
-#         if {$gaSet(pair)=="5"} {
-#           AddToLog "Pair $pair , $uut - $barcode"
-#         } else {
-#           AddToLog "Pair $gaSet(pair) , $uut - $barcode"
-#         }
-#       }
-#       
-#       if {$gaSet(pair)=="5"} {
-#         set gaSet(log.$pair) c:/logs/${gaSet(logTime)}-$barc1-$barc3.txt
-#         set pa $pair
-#       } else {
-#         set gaSet(log.$gaSet(pair)) c:/logs/${gaSet(logTime)}-$barc1-$barc3.txt
-#         set pa $gaSet(pair) 
-#       }
-#       AddToPairLog $pa "$gaSet(DutFullName)"
-#       AddToPairLog $pa "UUT1 - $barc1"
-#       AddToPairLog $pa "UUT2 - $barc3"
-#     } 
-#   }
+
+  return $ret
+}
+
+# ***************************************************************************
+# UnregIdBarcode
+# UnregIdBarcode $gaSet(1.barcode1)
+# UnregIdBarcode EA100463652
+# ***************************************************************************
+proc UnregIdBarcode {pa barcode {mac {}}} {
+  global gaSet
+  Status "Unreg ID Barcode $barcode"
+  set res [UnregIdMac $barcode $mac]
+    
+  puts "\nUnreg ID Barcode $barcode res:<$res>\n"
+  if {$res=="OK" || [string match "*No records to Delete by ID-Number*" $res]} {
+    set ret 0
+  } else {
+    set ret $res
+  }
+  AddToPairLog $pa "Unreg ID Barcode $barcode mac:<$mac> res:<$res> ret:<$ret>"
+  return $ret
+}
+
+# ***************************************************************************
+# UnregIdMac
+# ***************************************************************************
+proc UnregIdMac {barcode {mac {}}} {
+  set ret 0
+  set res ""
+  set url "http://ws-proxy01.rad.com:10211/ATE_WS/ws/rest/"
+  #set url "https://ws-proxy01.rad.com:8445/ATE_WS/ws/rest/"
+  set param "DisconnectBarcode\?mac=[set mac]\&idNumber=[set barcode]"
+  append url $param
+  puts "url:<$url>"
+  if [catch {set tok [::http::geturl $url -headers [list Authorization "Basic [base64::encode webservices:radexternal]"]]} res] {
+    return $res
+  } 
+  update
+  set st [::http::status $tok]
+  set nc [::http::ncode $tok]
+  if {$st=="ok" && $nc=="200"} {
+    #puts "Get $command from $barc done successfully"
+  } else {
+    set res "http::status: <$st> http::ncode: <$nc>"
+    set ret -1
+  }
+  upvar #0 $tok state
+  #parray state
+  #puts "body:<$state(body)>"
+  set ret $state(body)
+  ::http::cleanup $tok
+  
   return $ret
 }
 
